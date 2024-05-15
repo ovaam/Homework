@@ -1,0 +1,153 @@
+#include <iostream>
+
+class Date {
+ public :
+  int day = 0;
+  int month = 0;
+  int year = 0;
+  Date(int ndate, int nmonth, int nyear) {
+    day = ndate;
+    month = nmonth;
+    year = nyear;
+  }
+  int GetDay() const {
+    return day;
+  }
+  int GetMonth() const {
+    return month;
+  }
+  int GetYear() const {
+    return year;
+  }
+  int IfYearLeap(Date date_1) {
+    if ((date_1.year % 400 == 0) || (date_1.year % 4 == 0 && date_1.year % 100 != 0)) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+  int YearToDays(Date data) {
+    if (data.year) {
+      return 366;
+    } else {
+      return 365;
+    }
+  }
+  int MonthToDays(Date data) {
+    if (data.month == 2) {
+      if (YearToDays(data) == 366) {
+        return 29;
+      } else {
+        return 28;
+      }
+      return 28;
+    } else if (data.month % 2 == 0) {
+      return 30;
+    } else {
+      return 31;
+    }
+  }
+  int DiffDays(Date data) {
+    Date base(day, month, year);
+    return std::abs(day - data.day) +
+        +std::abs(MonthToDays(base) - MonthToDays(data)) +
+        +std::abs(YearToDays(base) - YearToDays(data));
+  }
+  Date DaysToCorrectData(Date data) {
+    if (data.day > 0) {
+      while (data.day >= 28) {
+        data.month += 1;
+        if (data.day - MonthToDays(data) <= 0) {
+          break;
+        }
+        data.day -= MonthToDays(data);
+      }
+      while (data.month >= 12) {
+        data.year += 1;
+        data.month -= 12;
+      }
+    } else {
+      while (data.day <= 0) {
+        data.month -= 1;
+        data.day += MonthToDays(data);
+      }
+      while (data.month <= 0) {
+        data.year -= 1;
+        if (data.day + MonthToDays(data) > 0) {
+          break;
+        }
+        data.month += 12;
+      }
+    }
+    Date tmp_date(day, month, year);
+    return tmp_date;
+  }
+  Date Add(int days) {
+    Date data(day, month, year);
+    data.day += days;
+    return DaysToCorrectData(data);
+  }
+  Date Substract(int days) {
+    Date data(day, month, year);
+    data.day -= days;
+    data = DaysToCorrectData(data);
+    return data;
+  }
+  Date Replace(int nday = 0, int nmonth = 0, int nyear = 0) {
+    day = nday;
+    month = nmonth;
+    year = nyear;
+  }
+  int Week() {
+    Date tmp_data(day, month, year);
+    int days = tmp_data.day;
+    while (tmp_data.month > 0) {
+      days += MonthToDays(tmp_data);
+      tmp_data.month -= 1;
+    }
+    return days / 7;
+  }
+  int TotalWeeks() {
+    // 1.01.1970
+    Date tmp_data(day, month, year);
+    int days = tmp_data.day;
+    while (tmp_data.year > 1970) {
+      days += YearToDays(tmp_data);
+      year -= 1;
+    }
+    while (tmp_data.month > 0) {
+      days += MonthToDays(tmp_data);
+      tmp_data.month -= 1;
+    }
+    return days / 7;
+  }
+  char *IsoFormat() {
+    static char buffer[11];
+    std::snprintf(buffer, sizeof(buffer), "%04d-%02d-%02d", year, month, day);
+    return buffer;
+  }
+};
+
+int main() {
+  int day = 0;
+  int month = 0;
+  int year = 0;
+
+  std::cout << "input day:" << "\n";
+  std::cin >> day;
+  std::cout << "input month:" << "\n";
+  std::cin >> month;
+  std::cout << "input year:" << "\n";
+  std::cin >> year;
+
+  if (day < 0 || day > 31 || year < 0 || month < 0 || month > 12) {
+    day = 1;
+    month = 1;
+    year = 1970;
+  }
+
+  Date date(day, month, year);
+
+  // std::cout << date.GetDay() << "\n";
+  return 0;
+}
